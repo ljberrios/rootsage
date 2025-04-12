@@ -118,6 +118,8 @@ This project was developed as part of a capstone course at the University of Pue
 
 ## Acknowledgments
 
-Special thanks to the Engine-4 Foundation for their valuable support of this project through:
-- Hardware resources for development
-- Technical mentorship and guidance
+Special thanks to:
+- Dr. Juan Solá Sloan for project advising and academic guidance
+- Engine-4 Foundation for their valuable support of this project through:
+  - Hardware resources for development
+  - Technical mentorship and guidance
