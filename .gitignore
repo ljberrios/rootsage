@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+*.egg-info/
+*.egg
+.pytest_cache/
+
+# Environment
+.env
+.venv/
+venv/
+ENV/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Database
+*.db
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Local development
+*.bat
+*.sql
+
+# System files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,88 @@
+<div class="card w-100 mt-3 mb-3">
+    <div class="card-body">
+        <h3 class="card-title fs-2">Sensor Data</h3>
+        <p class="card-text fs-5">
+            Name: {{ current_sensor["name"] }}<br>
+            Description: {{ current_sensor["desc"] }}<br>
+            Crop: {{ crop }}<br>
+            Last Reading: {{ current_sensor["last_update"] }}<br>
+            Install Date: {{ current_sensor["created_at"] }}
+        </p>
+    </div>
+</div>
+
+<p class="mt-4 fs-5" >The following measurements are based on the sensor's last reading:</p>
+
+<div class="card w-100 mb-3">
+    <div class="card-body">
+        <h3 class="card-title fs-2">Nitrogen</h3>
+        <p class="card-text fs-5">
+            Current Levels: <b>{{ n }} ml/kg</b><br>
+
+            {% if clf_N == "Okay" %}
+                State: <b class="text-success">{{ clf_N }}</b><br>
+            {% else %}
+                State: <b class="text-warning">{{ clf_N  }}</b><br>
+            {% endif %}
+
+            <br>
+
+            Used in relatively large amounts by all living things, nitrogen (N) is an essential nutrient.
+            It is a fundamental part of the chlorophyll molecule and is essential in the formation of
+            amino acids and proteins. A good supply of N is associated with vigorous growth and deep
+            green color. Plants deficient in N have stunted growth. Excess N may cause delayed
+            initiation of flowering or fruiting, and susceptibility to plant diseases.
+        </p>
+    </div>
+</div>
+
+<div class="card w-100 mb-3">
+    <div class="card-body">
+        <h3 class="card-title fs-2">Phosphorus</h3>
+        <p class="card-text fs-5">
+            Current Levels: <b>{{ p }} ml/kg</b><br>
+            
+            {% if clf_P == "Okay" %}
+                State: <b class="text-success">{{ clf_P }}</b><br>
+            {% else %}
+                State: <b class="text-warning">{{ clf_P  }}</b><br>
+            {% endif %}
+
+            <br>
+
+            Required in lower amounts than other major nutrients, phosphorus (P) is critical
+            in the early developmental stages of growth, and in energy transfer within the plant
+            throughout the growing season. It is important for photosynthesis, respiration, cell division, 
+            and many other processes. Deficiency in P strongly affects overall growth rates and is often 
+            difficult to diagnose correctly from visual symptoms alone. These symptoms only become distinctive 
+            when other nutrients are well supplied.
+        </p>
+    </div>
+</div>
+
+<div class="card w-100 mb-3">
+    <div class="card-body">
+        <h3 class="card-title fs-2">Potassium</h3>
+        <p class="card-text fs-5">
+            Current Levels: <b>{{ k }} ml/kg</b><br>
+
+            {% if clf_K == "Okay" %}
+                State: <b class="text-success">{{ clf_K }}</b><br>
+            {% else %}
+                State: <b class="text-warning">{{ clf_K  }}</b><br>
+            {% endif %}
+
+            <br>
+
+            Used in photosyntesis, cargohydrate transport, water regulation, and protein synthesis,
+            potassium (K) is frequently associated with improved crop quality as well as better
+            handling and storage properties. It is required by plants in approximately the same amounts
+            as nitrogen. Potassium deficiency may cause the following symptoms:
+            <ul class="fs-5">
+                <li>Stunted growth</li>
+                <li>Development of poor root systems</li>
+                <li>Leaf shedding, which ultimately leads to low yields</li>
+            </ul>
+        </p>
+    </div>
+</div>

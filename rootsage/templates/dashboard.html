@@ -1,0 +1,52 @@
+{% extends "base.html" %} 
+
+{% block title %}Dashboard{% endblock %} 
+
+{% block navlist %}
+<ul class="navbar-nav ms-4">
+    <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="#">Dashboard</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/app/reports/">Reports</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/app/sensors/">Sensors</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">
+            <i class="bi bi-box-arrow-right"></i>
+            Log Out
+        </a>
+    </li>
+</ul>
+{% endblock %} 
+
+{% block content %}
+<h2 class="fs-2 mt-4 mb-4">Welcome back, {{ username }}</h2>
+
+<select 
+    id="sensor-selector"
+    hx-get="/update_dashboard/"
+    hx-target="#dashboard-metrics"
+    hx-trigger="change"
+    name="current_sensor"
+    class="form-select form-select-lg mt-4"
+>
+    {% for sensor in sensors %}
+        <option 
+            value="{{ sensor }}"
+            {% if sensor == current_sensor %}
+                selected
+            {% endif %}
+        
+        >
+            {{ sensor }}
+        </option>
+    {% endfor %}
+</select>
+
+<div id="dashboard-metrics">
+    {% include "dashboard-metrics.html" %}
+</div>
+{% endblock %}
