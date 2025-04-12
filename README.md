@@ -115,3 +115,9 @@ MIT License - See LICENSE.txt for details
 ## Academic Context
 
 This project was developed as part of a capstone course at the University of Puerto Rico. Its primary goal is to demonstrate full-stack web development, basic ML implementation, and IoT data processing concepts.
+
+## Acknowledgments
+
+Special thanks to the Engine-4 Foundation for their valuable support of this project through:
+- Hardware resources for development
+- Technical mentorship and guidance
