@@ -2,6 +2,9 @@
 
 A capstone project web application for monitoring soil nutrient levels through sensor data.
 
+> **🚧 Project Status: Under Development**  
+> This project is currently in active development. Features and documentation may change frequently.
+
 ## About
 
 RootSage is an academic project developed as part of a capstone course. It demonstrates a full-stack web application that collects, processes, and displays soil nutrient data from NPK sensors, using machine learning models to classify nutrient levels.
