@@ -14,7 +14,10 @@
         <a class="nav-link" href="/app/sensors/">Sensors</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="/app/users">Users</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('logout') }}">
             <i class="bi bi-box-arrow-right"></i>
             Log Out
         </a>
@@ -27,7 +30,7 @@
 
 <select 
     id="sensor-selector"
-    hx-get="/update_dashboard/"
+    hx-get="/app/dashboard/update/"
     hx-target="#dashboard-metrics"
     hx-trigger="change"
     name="current_sensor"

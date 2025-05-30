@@ -22,7 +22,7 @@
             <div class="row">
                 <div class="col-xl-8 bg-light">
                     <h1 class="fixed-top fs-1 m-4 ms-4 text-dark">RootSage</h1>
-                    <form hx-post="/login/" hx-target="#error-message" >
+                    <form hx-post="/app/login/" hx-swap="innerHTML" hx-target="#error-message">
                         <div class="vh-100 d-flex flex-column justify-content-center align-items-center">
                             <h2 class="mb-4 text-dark">Login</h2>
 
@@ -36,6 +36,7 @@
                                     id="user"
                                     placeholder="name@example.com"
                                     aria-describedby="email-icon"
+                                    hx-on:focus="document.getElementById('error-message').innerHTML = ''"
                                 />
                                 <label for="user">
                                     <i class="bi bi-person text-black-50 me-3"></i>
@@ -49,6 +50,7 @@
                                     class="form-control form-control-lg"
                                     id="pass"
                                     placeholder="password"
+                                    hx-on:focus="document.getElementById('error-message').innerHTML = ''"
                                 />
                                 <label for="pass">
                                     <i class="bi bi-lock text-black-50 me-3"></i>
@@ -66,7 +68,7 @@
                 </div>
                 <div class="col-xl-4 bg-light d-none d-xl-block p-0" id="image">
                     <img
-                        src="../static/login-bg.jpg"
+                        src="../../static/login-bg.jpg"
                         class="vh-100 w-100 img-fluid border border-2 border-black"
                     />
                 </div>

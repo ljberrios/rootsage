@@ -1,0 +1,38 @@
+{% if sensors is none or sensors|length == 0 %}
+    <p class="fs-5 text-dark">No sensors found</p>
+{% else %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Crop</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Last Update</th>
+                    <th scope="col">Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sensor in sensors %}
+                    <tr>
+                        <th scope="row">{{ sensor["id"] }}</th>
+                        <td>{{ sensor["name"] }}</td>
+                        <td>{{ sensor["desc"] }}</td>
+                        <td>{{ sensor["crop_name"] }}</td>
+                        <td>
+                            {% if sensor["status"] %}
+                                Active
+                            {% else %}
+                                Inactive
+                            {% endif %}
+                        </td>
+                        <td>{{ sensor["last_update"] }}</td>
+                        <td>{{ sensor["created_at"] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}

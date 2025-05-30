@@ -23,7 +23,7 @@ def create_app(config):
     # init config
     app.config.from_object(config)
     app.config.from_prefixed_env(prefix="ROOTSAGE")
-    app.config.from_file("config.json", silent=True, load=json.load)
+    app.config.from_file("../config.json", silent=True, load=json.load)
 
     # init logging
     log_level = app.config["LOG_LEVEL"]

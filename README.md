@@ -1,15 +1,10 @@
 # RootSage
 
-A capstone project web application for monitoring soil nutrient levels through sensor data.
-
-> **🚧 Project Status: Under Development**  
-> This project is currently in active development. Features and documentation may change frequently.
+A web application for monitoring soil nutrient levels through sensor data. 
 
 ## About
 
-RootSage is an academic project developed as part of a capstone course. It demonstrates a full-stack web application that collects, processes, and displays soil nutrient data from NPK sensors, using machine learning models to classify nutrient levels.
-
-*Note: This is an experimental project developed for educational purposes.*
+RootSage was developed as a capstone project in partnership with the Engine-4 Foundation and the University of Puerto Rico. It demonstrates a full-stack web application that collects, processes, and displays soil nutrient data from NPK sensors, using machine learning models to classify nutrient levels.
 
 ## Features
 
@@ -22,8 +17,6 @@ RootSage is an academic project developed as part of a capstone course. It demon
 ### Backend
 - Flask-based server with SQLite database
 - Machine learning classifiers for NPK level categorization
-- User authentication with Argon2 password hashing
-- Environment-based configuration
 
 ### Frontend
 - Bootstrap 5 for responsive UI
@@ -73,16 +66,12 @@ Available settings:
 - Simple ML models for nutrient level classification
 - Basic user authentication
 - SQLite for data persistence
-- Rotating file logs
 
 ### Known Limitations
 
 - NPK sensor accuracy varies significantly with soil conditions
 - Basic ML models may need calibration for different environments
-- Single-user system
-- No data visualization or export features
 - Limited error handling
-- No input validation on sensor data ranges
 
 ### Potential Improvements
 
@@ -99,10 +88,8 @@ While this project serves its academic purpose, several improvements could be ma
    - Time series analysis
    - Nutrient trend visualization
    - Crop-specific recommendations
-   - Data export functionality
 
 3. System
-   - Multi-user support
    - Better API security
    - Documentation
    - Unit tests

@@ -1,0 +1,95 @@
+{% extends "base.html" %} 
+
+{% block title %}Reports{% endblock %} 
+
+{% block navlist %}
+<ul class="navbar-nav ms-4">
+    <li class="nav-item">
+        <a class="nav-link"  href="/app/dashboard">Dashboard</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="#">Reports</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link"  href="/app/sensors">Sensors</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/app/users">Users</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('logout') }}">
+            <i class="bi bi-box-arrow-right"></i>
+            Log Out
+        </a>
+    </li>
+</ul>
+{% endblock %} 
+
+{% block content %}
+<div class="card w-100 mt-3 mb-3">
+    <div class="card-body d-flex flex-column justify-content-center align-items-center">
+        <h2 class="fs-4 text-dark mb-4">Generate Report</h2>
+        <form method="POST" class="w-75">
+            <!-- <div id="error-message" class="w-100"></div> -->
+            <div class="row g-3">
+                <div class="col-12">
+                    <label for="start_date" class="form-label">Start Date</label>
+                    <input 
+                        type="date" 
+                        class="form-control form-control-lg" 
+                        id="start_date" 
+                        name="start_date" 
+                        placeholder="Start Date"
+                        required
+                    >
+                </div>
+                <div class="col-12">
+                    <label for="end_date" class="form-label">End Date</label>
+                    <input 
+                        type="date" 
+                        class="form-control form-control-lg" 
+                        id="end_date" 
+                        name="end_date" 
+                        placeholder="End Date"
+                        required
+                    >
+                </div>
+                <div class="col-12">
+                    <label for="sensor-selector" class="form-label">Sensor</label>
+                    <select 
+                        id="sensor-selector"
+                        name="sensor-selector"
+                        class="w-100 form-select form-select-lg"
+                    >
+                        <option value="any">any</option>
+                        {% for sensor in sensors %}
+                            <option value="{{ sensor }}">{{ sensor }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label for="crop-selector" class="form-label">Crop</label>
+                    <select 
+                        id="crop-selector"
+                        name="crop-selector"
+                        class="w-100 mb-3 form-select form-select-lg"
+                    >
+                        <option value="any">any</option>
+                        {% for crop in crops %}
+                            <option value="{{ crop }}">{{ crop }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 mt-3 mb-3 d-flex justify-content-center align-items-center">
+                    <button 
+                        type="submit" 
+                        class="rounded-pill btn btn-lg btn-outline-dark w-100"
+                    >
+                        Generate Report
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

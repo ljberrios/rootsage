@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Users{% endblock %}
+
+{% block navlist %}
+<ul class="navbar-nav ms-4">
+    <li class="nav-item">
+        <a class="nav-link" href="/app/dashboard">Dashboard</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/app/reports/">Reports</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/app/sensors/">Sensors</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="#">Users</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('logout') }}">
+            <i class="bi bi-box-arrow-right"></i>
+            Log Out
+        </a>
+    </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row align-items-start mt-3">
+    <div class="col-lg">
+        <div class="card w-100 mb-3">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <h2 class="fs-4 text-dark mb-4">Register User</h2>
+                <form class="w-75" hx-post="/app/users/" hx-swap="innerHTML" hx-target="#error-message">
+                    <div id="error-message" class="w-100"></div>
+                    <div class="form-floating w-100 mb-3">
+                        <input 
+                            name="user" 
+                            type="text" class="form-control form-control-lg" 
+                            id="user"
+                            placeholder="name@example.com" 
+                            aria-describedby="email-icon"
+                            hx-on:focus="document.getElementById('error-message').innerHTML = ''"
+                            required
+                        />
+                        <label for="user">
+                            <i class="bi bi-person text-black-50 me-3"></i>
+                            Username
+                        </label>
+                    </div>
+                    <div class="form-floating w-100 mb-3">
+                        <input 
+                            name="pass" 
+                            type="password" 
+                            class="form-control form-control-lg" 
+                            id="pass"
+                            placeholder="password" 
+                            hx-on:focus="document.getElementById('error-message').innerHTML = ''"
+                            required
+                        />
+                        <label for="pass">
+                            <i class="bi bi-lock text-black-50 me-3"></i>
+                            Password
+                        </label>
+                    </div>
+                    <div class="form-floating w-100 mb-3">
+                        <input 
+                            name="confirm-pass" 
+                            type="password" 
+                            class="form-control form-control-lg" 
+                            id="confirm-pass"
+                            placeholder="confirm password"
+                            hx-on:focus="document.getElementById('error-message').innerHTML = ''"
+                            required
+                        />
+                        <label for="confirm-pass">
+                            <i class="bi bi-lock text-black-50 me-3"></i>
+                            Confirm Password
+                        </label>
+                    </div>
+                    <button 
+                        type="submit" 
+                        class="w-100 mt-3 mb-3 rounded-pill btn btn-lg btn-outline-dark"
+                    >
+                        Register
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg mb-3">
+        <div class="card w-100 mb-3">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <h2 class="fs-4 text-dark mb-4">Search User</h2>
+                <input 
+                    name="search" 
+                    type="search" 
+                    class="form-control form-control-lg w-75 mb-4" 
+                    id="search"
+                    placeholder="Search (id or username)"
+                    hx-trigger="input changed delay:1000ms, keyup[key=='Enter'], load"
+                    hx-post="/app/users/search/"
+                    hx-target="#search-results"
+                    hx-indicator=".htmx-indicator"
+                />
+
+                <div class="w-100" id="search-results"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

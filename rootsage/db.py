@@ -37,8 +37,8 @@ def create_tables(conn):
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL UNIQUE,
                     desc TEXT,
-                    crop INTEGER NOT NULL,
-                    is_active INTEGER NOT NULL DEFAULT 0,
+                    crop INTEGER NOT NULL,        
+                    status INTEGER NOT NULL DEFAULT 0,
                     last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (crop) REFERENCES crops (id)
@@ -61,7 +61,9 @@ def create_tables(conn):
                 CREATE TABLE IF NOT EXISTS users (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     username VARCHAR(15) NOT NULL UNIQUE,
-                    phash TEXT NOT NULL         
+                    phash TEXT NOT NULL,
+                    last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             """)
     except sqlite3.Error:
@@ -79,14 +81,18 @@ def add_crop(conn, name):
     try:
         with conn:
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO crops (id) VALUES (?);", (name,))
-            current_app.logger.info(f"Inserted crop '{name}'")
+            cursor.execute("""
+                INSERT INTO crops (name) VALUES (?) 
+                ON CONFLICT(name) DO NOTHING;
+            """, (name,))
+            if (cursor.rowcount > 0):
+                current_app.logger.info(f"Inserted crop '{name}'")
     except sqlite3.Error:
         current_app.logger.exception("Error inserting crop")
         raise # catch integrity error
 
 
-def get_crops(conn):
+def get_all_crops(conn):
     """
     Get all crops from the crops table.
 
@@ -127,7 +133,7 @@ def add_npk_data(conn, n, p, k, sensor_id):
         current_app.logger.exception("Error inserting nutrient data")
 
 
-def get_n_latest(conn, n=10):
+def get_latest_npk_data(conn, n=10):
     """
     Get the latest N rows from the nutrients data table.
 
@@ -150,7 +156,7 @@ def get_n_latest(conn, n=10):
         current_app.logger.exception("Error getting nutrient data")
 
 
-def get_n_latest_df(conn, sensor_name, n=10):
+def get_latest_npk_data_df(conn, sensor_name, n=10):
     """
     Get the latest N rows from the nutrient data table,
     along with the crop associated with the sensor that
@@ -195,7 +201,38 @@ def get_n_latest_df(conn, sensor_name, n=10):
         current_app.logger.exception("Error getting nutrient data")
 
 
-def add_sensor(conn, name, desc=None, label=None, is_active=1):
+def get_npk_data_df(conn, start_date, end_date, sensor_name=None, crop_name=None):
+    query = """
+        SELECT
+            npk.n as N,
+            npk.p as P,
+            npk.k as K,
+            npk.created_at,
+            s.crop - 1 as label,
+            c.name as crop_name
+        FROM npk_data npk
+        JOIN sensors s ON npk.sensor_id = s.id
+        JOIN crops c ON s.crop = c.id
+        WHERE npk.created_at BETWEEN ? AND ?
+    """
+
+    params = [start_date, end_date]
+    if sensor_name != "any":
+        query += " AND s.name = ?"
+        params.append(sensor_name)
+    if crop_name != "any":
+        query += " AND c.name = ?"
+        params.append(crop_name)
+    query += " ORDER BY npk.created_at ASC;"
+    
+    try:
+        with conn:
+            return read_sql_query(query, conn, params=params)
+    except sqlite3.Error:
+        current_app.logger.exception("Error getting nutrient data")
+
+
+def add_sensor(conn, name, desc=None, label=None, status=1):
     """
     Add a sensor to the database.
 
@@ -203,23 +240,23 @@ def add_sensor(conn, name, desc=None, label=None, is_active=1):
     :param name: the sensor's name
     :param desc: the sensor's purpose
     :param crop: the crop
-    :param is_active: 1 if the sensor is active, 0 otherwise
+    :param status: 1 if the sensor is active, 0 otherwise
     """
 
     try:
         with conn:
             cursor = conn.cursor()
             cursor.execute("""
-                INSERT INTO sensors (name, desc, crop, is_active)
+                INSERT INTO sensors (name, desc, crop, status)
                     VALUES (?, ?, ?, ?);
-            """, (name, desc, label, is_active))
+            """, (name, desc, label, status))
             current_app.logger.info(f"Inserted sensor '{name}'")
     except sqlite3.Error:
         current_app.logger.exception("Error inserting sensor")
         raise # catch integrity error
 
 
-def get_sensor(conn, id=None, name=None):
+def get_sensor(conn, name):
     """
     Get the data for a given sensor.
 
@@ -230,13 +267,41 @@ def get_sensor(conn, id=None, name=None):
     try:
         with conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM sensors WHERE id=? OR name=?;", (id, name))
+            cursor.execute("SELECT * FROM sensors WHERE name=?;", (name,))
             row = cursor.fetchone()
             if row is not None:
-                current_app.logger.info(f"Fetched data for sensor: id={id}, name={name}")
+                current_app.logger.info(f"Fetched data for sensor with name '{name}'")
             else:
-                current_app.logger.info(f"Could not find sensor data: id={id}, name={name}")
+                current_app.logger.info(f"Could not find sensor data with name '{name}'")
             return row 
+    except sqlite3.Error:
+        current_app.logger.exception("Error getting sensor data")
+
+
+def get_all_sensors(conn):
+    """
+    Get all sensors from the database.
+
+    :param conn: the database connection
+    """
+
+    try:
+        with conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT 
+                    s.*,
+                    c.name as crop_name
+                FROM sensors s
+                JOIN crops c ON s.crop = c.id
+                ORDER BY s.id;
+            """)
+            rows = cursor.fetchall()
+            if len(rows) > 0:
+                current_app.logger.info(f"Fetched data for all sensors: {len(rows)} row(s)")
+            else:
+                current_app.logger.info("Could not find any sensors")
+            return rows
     except sqlite3.Error:
         current_app.logger.exception("Error getting sensor data")
 
@@ -251,7 +316,7 @@ def get_active_sensors(conn):
     try:
         with conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM sensors WHERE is_active=1;")
+            cursor.execute("SELECT * FROM sensors WHERE status=1;")
             rows = cursor.fetchall()
             if len(rows) > 0:
                 current_app.logger.info("Fetched data for all active sensors")
@@ -262,24 +327,60 @@ def get_active_sensors(conn):
         current_app.logger.exception("Error getting sensor data")
 
 
+def search_sensors(conn, arg):
+    """
+    Search for sensors by name or id.
+
+    :param conn: the database connection
+    :param arg: the search term (id or name)
+    :return: a list of sensors that match the search term
+    """
+
+    try:
+        with conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT 
+                    s.*,
+                    c.name as crop_name
+                FROM sensors s
+                JOIN crops c ON s.crop = c.id
+                WHERE instr(s.name, ?) > 0 OR instr(c.name, ?) OR s.id LIKE ?
+                ORDER BY s.id;
+            """, (arg, arg, arg))
+            rows = cursor.fetchall()
+            if len(rows) > 0:
+                current_app.logger.info(f"Searched for sensors with arg '{arg}': {len(rows)} row(s)")
+            else:
+                current_app.logger.info(f"Could not find any sensors: arg={arg}")
+            return rows
+    except sqlite3.Error:
+        current_app.logger.exception("Error getting sensor data")
+
+
 class User(UserMixin):
-    def __init__(self, user_id, username, phash):
+    def __init__(self, user_id, username, phash, last_login=None, created_at=None):
         """
         :param user_id: the user's internal id (optional)
         :param username: the user's username
         :param phash: the password hash
+        :param last_login: the last time the user logged in (optional)
+        :param created_at: the time the user was created (optional)
         """
         self.id = str(user_id)
         self.username = username
         self.phash = phash
+        self.last_login = last_login
+        self.created_at = created_at
 
 
-def add_user(conn, user):
+def add_user(conn, username, phash):
     """
     Add a user to the database.
 
     :param conn: the database connection
-    :param user: the user to add
+    :param username: the user's username
+    :param phash: the password hash
     """
 
     try:
@@ -288,10 +389,52 @@ def add_user(conn, user):
             cursor.execute("""
                INSERT INTO users (username, phash)
                     VALUES (?, ?);            
-            """, (user.username, user.phash))
-            current_app.logger.info(f"Inserted user '{user.username}'")
+            """, (username, phash))
+            current_app.logger.info(f"Inserted user '{username}'")
     except sqlite3.Error:
         current_app.logger.exception("Error adding user")
+
+
+def get_all_users(conn):
+    try:
+        with conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users ORDER BY id;")
+            rows = cursor.fetchall()
+            if len(rows) > 0:
+                current_app.logger.info(f"Fetched data for all users: {len(rows)} row(s)")
+            else:
+                current_app.logger.info(f"Could not find any users")
+            return rows
+    except sqlite3.Error:
+        current_app.logger.exception("Error getting users from arg")
+
+
+def search_users(conn, arg):
+    """
+    Search for users by name or id.
+
+    :param conn: the database connection
+    :param arg: the search term (id or name)
+    :return: a list of users that match the search term
+    """
+
+    try:
+        with conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT * FROM users
+                    WHERE instr(username, ?) > 0 OR id LIKE ?
+                    ORDER BY id;
+            """, (arg, arg))
+            rows = cursor.fetchall()
+            if len(rows) > 0:
+                current_app.logger.info(f"Searched for users with arg '{arg}': {len(rows)} row(s)")
+            else:
+                current_app.logger.info(f"Could not find any users: arg={arg}")
+            return rows
+    except sqlite3.Error:
+        current_app.logger.exception("Error getting users from arg")
 
 
 def get_user(conn, user_id):
@@ -305,17 +448,14 @@ def get_user(conn, user_id):
     try:
         with conn:
             cursor = conn.cursor()
-            cursor.execute(
-            """SELECT id, username, phash 
-                    FROM users WHERE id=?;
-            """, (user_id,))
+            cursor.execute("SELECT * FROM users WHERE id=?;", (user_id,))
             row = cursor.fetchone()
             if row is not None:
                 current_app.logger.info(f"Fetched data for user with id '{user_id}'")
                 return User(*row)
             else:
                 current_app.logger.info(f"Could not find data for user with id '{user_id}'")
-                return row
+                return None
     except sqlite3.Error:
         current_app.logger.exception("Error getting user")
 
@@ -327,14 +467,10 @@ def get_user_by_name(conn, username):
     :param conn: the database connection
     :param username: the user's username
     """
-
     try:
         with conn:
             cursor = conn.cursor()
-            cursor.execute(
-            """SELECT id, username, phash 
-                    FROM users WHERE username=?;
-            """, (username,))
+            cursor.execute("SELECT * FROM users WHERE username=?;", (username,))
             row = cursor.fetchone()
             if row is not None:
                 current_app.logger.info(f"Fetched data for user '{username}'")
@@ -359,11 +495,29 @@ def update_user(conn, user):
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE users 
-                SET username=?
-                    phash=?
+                SET username=?,
+                    phash=?,
+                    last_login=?
                 WHERE id=?;
-            """, (user.phash, user.username, int(user.id)))
+            """, (user.username, user.phash, user.last_login, int(user.id)))
+            current_app.logger.info(f"Updated user '{user.username}'")
     except sqlite3.Error:
         current_app.logger.exception("Error updating user")
+
+
+def delete_user(conn, user_id):
+    """
+    Delete a user from the database.
+
+    :param conn: the database connection
+    :param user_id: the user's internal id
+    """
+    try:
+        with conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM users WHERE id=?;", (user_id,))
+            current_app.logger.info(f"Deleted user with id '{user_id}'")
+    except sqlite3.Error:
+        current_app.logger.exception("Error deleting user")
 
 

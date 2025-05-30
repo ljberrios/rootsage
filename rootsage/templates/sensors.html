@@ -5,16 +5,19 @@
 {% block navlist %}
 <ul class="navbar-nav ms-4">
     <li class="nav-item">
-        <a class="nav-link active" aria-current="page" href="#">Dashboard</a>
+        <a class="nav-link"  href="/app/dashboard">Dashboard</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#">Reports</a>
+        <a class="nav-link" href="/app/reports">Reports</a>
     </li>
     <li class="nav-item">
         <a class="nav-link active" aria-current="page" href="#">Sensors</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="/app/users">Users</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('logout') }}">
             <i class="bi bi-box-arrow-right"></i>
             Log Out
         </a>
@@ -23,5 +26,93 @@
 {% endblock %} 
 
 {% block content %}
+<div class="card w-100 mt-3 mb-3">
+    <div class="card-body d-flex flex-column justify-content-center align-items-center">
+        <h2 class="fs-4 text-dark mb-4">Register Sensor</h2>
+        <form class="w-75" hx-post="/app/sensors/" hx-swap="innerHTML" hx-target="#error-message">
+            <div id="error-message" class="w-100"></div>
+            <div class="form-floating w-100 mb-3">
+                <input 
+                    name="name" 
+                    type="text" class="form-control form-control-lg mb-3" 
+                    id="name"
+                    placeholder="sensor name"
+                    hx-on:focus="document.getElementById('error-message').innerHTML = ''"
+                    required
+                />
+                <label for="name">
+                    <i class="bi bi-person text-black-50 me-3"></i>
+                    Name
+                </label>
+            </div>
+            <div class="form-floating w-100 mb-3">
+                <textarea 
+                    name="desc" 
+                    class="form-control form-control-lg" 
+                    id="desc"
+                    rows="3"
+                    placeholder="description"
+                    hx-on:focus="document.getElementById('error-message').innerHTML = ''"
+                ></textarea>
+                <label for="desc">
+                    <i class="bi bi-pencil text-black-50 me-3"></i>
+                    Description
+                </label>
+            </div>
+            <select class="form-select form-select-lg mb-3" name="crop" id="crop" required>
+                <option value="" selected disabled>Select crop</option>
+                {% for crop in crops %}
+                    <option value="{{ crop.id }}">{{ crop.name }}</option>
+                {% endfor %}
+            </select>
+            <div class="button-group w-100 mb-3 d-flex justify-content-center align-items-center" role="group">
+                <input 
+                    type="radio"
+                    id="active"
+                    name="status"
+                    class="btn-check"
+                    autocomplete="off"
+                    value="1"
+                    checked
+                >
+                <label class="btn btn-lg me-4" for="active">Active</label>
+                <input 
+                    type="radio" 
+                    id="inactive"
+                    name="status"
+                    class="btn-check"
+                    value="0"
+                    autocomplete="off"
+                >
+                <label class="btn btn-lg" for="inactive">Inactive</label>
+            </div>
+            <button 
+                type="submit" 
+                class="w-100 mt-3 mb-3 rounded-pill btn btn-lg btn-outline-dark"
+            >
+                Register
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="card w-100 mb-3">
+    <div class="card-body d-flex flex-column justify-content-center align-items-center">
+        <h2 class="fs-4 text-dark mb-4">Search Sensor</h2>
+        <input 
+            name="search"
+            type="search" 
+            class="form-control form-control-lg w-75 mb-4" 
+            id="search"
+            placeholder="Search (id or name)"
+            hx-trigger="input changed delay:1000ms, keyup[key=='Enter'], load"
+            hx-post="/app/sensors/search"
+            hx-target="#search-results"
+            hx-indicator=".htmx-indicator"
+        />
+
+        <div class="w-100" id="search-results"></div>
+    </div>
+</div>
 
 {% endblock %}
